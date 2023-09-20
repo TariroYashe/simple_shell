@@ -1,52 +1,40 @@
 #include "shell_header.h"
 
 /**
-* execute_input - func to execute the input
-* @input : is a pointer to a char string rep the shell input to be exec
-* Description : This function takes a single argument, input, which is
-* a pointer to a character string representing the shell input to be executed.
+* execute_input - Execute a command with its arguments.
+* @args: An array of command arguments.
+*
+* Return: 0 on success, 1 on failure.
 */
-void execute_input(char *input)
+int execute_input(char **args)
 {
-int outcome;
-pid_t process_id = create_process_id();
+pid_t child_pid;
+int status;
 
-char **args = malloc(2 * sizeof(char *));
-if (args == NULL)
+child_pid = fork();
+
+if (child_pid == -1)
 {
-perror("malloc");
-exit(1);
+display_error("fork");
+return (1);
 }
 
-args[0] = input;
-args[1] = NULL;
-
-if (process_id == 0)
+if (child_pid == 0)
 {
-if (execve(input, args, environ) == -1)
+/*This code runs in the child process*/
+if (execve(args[0], args, NULL) == -1)
 {
-handle_execution_error(input);
+display_error("execve");
+exit(EXIT_FAILURE);
 }
 }
 else
 {
-if (waitpid(process_id, &outcome, 0) == -1)
-{
-perror("waitpid");
-exit(1);
-}
-if (outcome == 0)
-{
-shell_print(" ");
-}
-else
-{
-shell_print(" ");
-_exit(outcome);
-}
+/*This code runs in the parent process*/
+waitpid(child_pid, &status, WUNTRACED);
+return (0);
 }
 
-free(args);
+return (1); /* Return 1 in case of failure*/
 }
-
 

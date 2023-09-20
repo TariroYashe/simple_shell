@@ -10,12 +10,16 @@
 #include <sys/types.h>
 #include <string.h>
 
+
 int main(void);
-void shell_print(const char *letters);
-void display_prompt(void);
-void execute_input(char *input);
-pid_t create_process_id(void);
-void handle_execution_error(char *input);
-char *read_input(char **input, size_t *input_size);
-extern char **environ;
+char *read_input(void);
+void display_error(char *msg);
+int execute_input(char **args);
+void handle_sigint(int signo);
+void handle_sigquit(int signo);
+void handle_sigstp(int signo);
+void free_tok(char **tokens);
+char **parse_input(char *input);
+
 #endif
+
