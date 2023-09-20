@@ -1,5 +1,4 @@
 #include "shell_header.h"
-
 /**
 * main - implements a simple shell
 *
@@ -10,30 +9,31 @@ int main(void)
 char *input;
 char **args;
 int status;
+int is_interactive = isatty(STDIN_FILENO);
 
-/* Register signal handlers */
 signal(SIGINT, handle_sigint);
-signal(SIGQUIT, handle_sigquit);
-signal(SIGTSTP, handle_sigstp);
+signal(SIGQUIT, SIG_IGN);
+signal(SIGTSTP, SIG_IGN);
 
 do {
-input = read_input();
-if (!input || !*input)/* EOF detected, exit the loop */
+if (is_interactive)
+write(STDOUT_FILENO, "($) ", 4);
+
+input = _getline();
+if (!input || !*input) /* EOF detected, exit the loop */
 break;
 
-args = parse_input(input);
+args = parse_input_with_args(input);
 if (!args || !*args)
 {
 free(input);
-free_tok(args);
 continue;
 }
+
 status = execute_input(args);
+
 free(input);
 free_tok(args);
-
-/* Set status to 1 to continue the loop */
-status = 1;
 } while (status);
 
 return (EXIT_SUCCESS);
