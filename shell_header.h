@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <string.h>
 
+int main(void);
 void shell_print(const char *letters);
 void display_prompt(void);
 void execute_input(char *input);
