@@ -1,32 +1,40 @@
 #include "shell_header.h"
 
-bool shell_running = true;
 /**
-* main - Implements a simple shell
+* main - implements a simple shell
 *
 * Return: EXIT_SUCCESS.
 */
 int main(void)
 {
 char *input;
+char **args;
+int status;
 
-signal(SIGINT, SIG_IGN);
-signal(SIGQUIT, SIG_IGN);
+/* Register signal handlers */
+signal(SIGINT, handle_sigint);
+signal(SIGQUIT, handle_sigquit);
+signal(SIGTSTP, handle_sigstp);
 
 do {
-display_prompt();
-
-input_size = MAX_INPUT_SIZE;
-input = read_input(&input, &input_size);
-
-
-if (!input || !*input)
+input = read_input();
+if (!input || !*input)/* EOF detected, exit the loop */
 break;
 
-execute_input(input);
+args = parse_input(input);
+if (!args || !*args)
+{
 free(input);
+free_tok(args);
+continue;
+}
+status = execute_input(args);
+free(input);
+free_tok(args);
 
-} while (1);
+/* Set status to 1 to continue the loop */
+status = 1;
+} while (status);
 
 return (EXIT_SUCCESS);
 }
