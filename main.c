@@ -1,38 +1,40 @@
 #include "shell_header.h"
 
 /**
-* main - Entry point for the simple shell program
+* main - implements a simple shell
 *
-* Description:
-* This function serves as the entry point for the simple shell program. It
-* displays a prompt, reads user input, executes simple commands, and repeats
-* until an EOF condition (Ctrl+D) is encountered.
-*
-* Return: Always returns 0 to indicate successful execution.
+* Return: EXIT_SUCCESS.
 */
 int main(void)
 {
-char *input = NULL;
-size_t input_size = 0;
+char *input;
+char **args;
+int status;
 
-while (1)
-{
-display_prompt();
-input = read_input(&input, &input_size);
+/* Register signal handlers */
+signal(SIGINT, handle_sigint);
+signal(SIGQUIT, handle_sigquit);
+signal(SIGTSTP, handle_sigstp);
 
-if (input == NULL)
-{
+do {
+input = read_input();
+if (!input || !*input)/* EOF detected, exit the loop */
 break;
-}
 
-if (strlen(input) > 0)
+args = parse_input(input);
+if (!args || !*args)
 {
-execute_input(input);
-}
-}
-
 free(input);
-
-return (0);
+free_tok(args);
+continue;
 }
+status = execute_input(args);
+free(input);
+free_tok(args);
 
+/* Set status to 1 to continue the loop */
+status = 1;
+} while (status);
+
+return (EXIT_SUCCESS);
+}
