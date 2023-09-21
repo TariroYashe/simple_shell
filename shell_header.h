@@ -1,6 +1,7 @@
 #ifndef _SHELL_HEADER_H
 #define _SHELL_HEADER_H
 #define MAX_INPUT_SIZE 1024
+#define READ_SIZE 1024
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,7 @@ char **parse_input(char *input);
 char *search_executable_in_path(char **args);
 char *construct_executable_path(const char *dir, const char *command);
 int execute_command(char **args);
+
 
 #endif
 
