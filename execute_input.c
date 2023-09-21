@@ -1,4 +1,5 @@
 #include "shell_header.h"
+
 /**
 * execute_input - Execute a command with its arguments.
 * @args: An array of command arguments.
@@ -7,24 +8,32 @@
 */
 int execute_input(char **args)
 {
-/*Check if the command is a full path to an executable*/
-if (access(args[0], X_OK) == 0)
+pid_t child_pid;
+int status;
+
+child_pid = fork();
+
+if (child_pid == -1)
 {
-return (execute_command(args));
-}
-else
-{
-char *executable_path = search_executable_in_path(args);
-if (executable_path != NULL)
-{
-int result = execute_command(args);
-free(executable_path);
-return (result);
-}
-else
-{
-display_error("Command not found");
+display_error("fork");
 return (1);
 }
+
+if (child_pid == 0)
+{
+/* This code runs in the child process */
+if (execve(args[0], args, NULL) == -1)
+{
+display_error("execve");
+exit(EXIT_FAILURE);
 }
+}
+else
+{
+/* This code runs in the parent process */
+waitpid(child_pid, &status, WUNTRACED);
+return (0);
+}
+
+return (1); /* Return 1 in case of failure */
 }
