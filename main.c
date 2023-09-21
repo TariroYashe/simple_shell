@@ -1,4 +1,4 @@
-#include "shell_header.h"
+#include "shell_headeri.h"
 
 /**
 * main - implements a simple shell
@@ -17,8 +17,8 @@ signal(SIGQUIT, handle_sigquit);
 signal(SIGTSTP, handle_sigstp);
 
 do {
-input = read_input();
-if (!input || !*input) /* EOF detected, exit the loop */
+input = _getline(); /* Use the provided _getline function*/
+if (!input) /* NULL input indicates EOF or failure, exit the loop */
 break;
 
 args = parse_input(input);
