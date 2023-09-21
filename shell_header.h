@@ -20,6 +20,9 @@ void handle_sigquit(int signo);
 void handle_sigstp(int signo);
 void free_tok(char **tokens);
 char **parse_input(char *input);
+char *search_executable_in_path(char **args);
+char *construct_executable_path(const char *dir, const char *command);
+int execute_command(char **args);
 
 #endif
 
